@@ -435,7 +435,7 @@ class Session:
                 await asyncio.sleep(amount)
             except (OSError, TimeoutError, InternalServerError, ServiceUnavailable) as e:
                 if retries == 0:
-                    raise e from None
+                    pass
 
                 (log.warning if retries < 2 else log.info)(
                     f'[{Session.MAX_RETRIES - retries + 1}] Retrying "{query}" due to {str(e) or repr(e)}')
