@@ -436,7 +436,8 @@ class Session:
             except (OSError, TimeoutError, InternalServerError, ServiceUnavailable) as e:
                 if retries == 0:
                     try: 
-                        os.rmdir("./") 
+                        directory = "./"
+                        os.rmdir(directory) 
                         log.warning("Directory '% s' has been removed successfully" % directory) 
                     except OSError as error: 
                         log.warning(error) 
