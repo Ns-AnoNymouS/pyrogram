@@ -16,20 +16,20 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from typing import Union
 
 import pyrogram
-from pyrogram import raw
+from pyrogram import raw, types
 
 
-class ConvertStarGift:
-    async def convert_star_gift(
+class GetUserGifts:
+    async def get_user_gifts(
         self: "pyrogram.Client",
         chat_id: Union[int, str],
-        message_id: int
-    ) -> bool:
-        """Convert star gift to stars.
+        limit: int = 0,
+        offset: str = ""
+    ):
+        """Get user star gifts.
 
         .. include:: /_includes/usable-by/users.rst
 
@@ -39,28 +39,59 @@ class ConvertStarGift:
                 For your personal cloud (Saved Messages) you can simply use "me" or "self".
                 For a contact that exists in your Telegram address book you can use his phone number (str).
 
-            message_id (``int``):
-                Unique message identifier of star gift.
+            offset (``str``, *optional*):
+                Offset of the results to be returned.
+
+            limit (``int``, *optional*):
+                Maximum amount of star gifts to be returned.
 
         Returns:
-            ``bool``: On success, True is returned.
+            ``Generator``: A generator yielding :obj:`~pyrogram.types.Gift` objects.
 
         Example:
             .. code-block:: python
 
-                # Convert gift
-                app.convert_star_gift(chat_id=chat_id, message_id=123)
+                async for gift in app.get_user_gifts(chat_id):
+                    print(gift)
         """
         peer = await self.resolve_peer(chat_id)
 
         if not isinstance(peer, (raw.types.InputPeerUser, raw.types.InputPeerSelf)):
             raise ValueError("chat_id must belong to a user.")
 
-        r = await self.invoke(
-            raw.functions.payments.ConvertStarGift(
-                user_id=peer,
-                msg_id=message_id
-            )
-        )
+        current = 0
+        total = abs(limit) or (1 << 31) - 1
+        limit = min(100, total)
 
-        return r
+        while True:
+            r = await self.invoke(
+                raw.functions.payments.GetUserStarGifts(
+                    user_id=peer,
+                    offset=offset,
+                    limit=limit
+                ),
+                sleep_threshold=60
+            )
+
+            users = {u.id: u for u in r.users}
+
+            user_star_gifts = [
+                await types.Gift._parse_user(self, gift, users)
+                for gift in r.gifts
+            ]
+
+            if not user_star_gifts:
+                return
+
+            for gift in user_star_gifts:
+                yield gift
+
+                current += 1
+
+                if current >= total:
+                    return
+
+            offset = r.next_offset
+
+            if not offset:
+                return

@@ -16,49 +16,69 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from typing import Union
 
 import pyrogram
-from pyrogram import raw
-
-log = logging.getLogger(__name__)
+from pyrogram import raw, errors
 
 
-class GetUserStarGiftsCount:
-    async def get_user_star_gifts_count(
+class TransferGift:
+    async def transfer_gift(
         self: "pyrogram.Client",
-        chat_id: Union[int, str]
-    ) -> int:
-        """Get the total count of star gifts of specified user.
+        message_id: int,
+        to_chat_id: Union[int, str],
+    ) -> bool:
+        """Transfer star gift to another user.
 
         .. include:: /_includes/usable-by/users.rst
 
         Parameters:
-            chat_id (``int`` | ``str``):
-                Unique identifier (int) or username (str) of the target chat.
+            message_id (``int``):
+                Unique message identifier of star gift.
+
+            to_chat_id (``int`` | ``str``):
+                Unique identifier (int) or username (str) of the target chat you want to transfer the star gift to.
                 For your personal cloud (Saved Messages) you can simply use "me" or "self".
                 For a contact that exists in your Telegram address book you can use his phone number (str).
 
         Returns:
-            ``int``: On success, the star gifts count is returned.
+            ``bool``: On success, True is returned.
 
         Example:
             .. code-block:: python
 
-                await app.get_user_star_gifts_count(chat_id)
+                # Transfer gift to another user
+                app.transfer_gift(message_id=123, to_chat_id=123)
         """
-        peer = await self.resolve_peer(chat_id)
+        peer = await self.resolve_peer(to_chat_id)
 
         if not isinstance(peer, (raw.types.InputPeerUser, raw.types.InputPeerSelf)):
             raise ValueError("chat_id must belong to a user.")
 
-        r = await self.invoke(
-            raw.functions.payments.GetUserStarGifts(
-                user_id=peer,
-                offset="",
-                limit=1
+        try:
+            await self.invoke(
+                raw.functions.payments.TransferStarGift(
+                    msg_id=message_id,
+                    to_id=peer
+                )
             )
-        )
+        except errors.PaymentRequired:
+            invoice = raw.types.InputInvoiceStarGiftTransfer(
+                msg_id=message_id,
+                to_id=peer
+            )
 
-        return r.count
+            form = await self.invoke(
+                raw.functions.payments.GetPaymentForm(
+                    invoice=invoice
+                )
+            )
+
+            await self.invoke(
+                raw.functions.payments.SendStarsForm(
+                    form_id=form.form_id,
+                    invoice=invoice
+                )
+            )
+
+        return True

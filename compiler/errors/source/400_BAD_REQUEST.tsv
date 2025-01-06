@@ -330,6 +330,7 @@ PASSWORD_RECOVERY_NA	The password recovery e-mail is not available
 PASSWORD_REQUIRED	The two-step verification password is required for this method
 PASSWORD_TOO_FRESH_X	The two-step verification password was added recently and you are required to wait {value} seconds
 PAYMENT_PROVIDER_INVALID	The payment provider was not recognised or its token was invalid
+PAYMENT_REQUIRED	The payment is required
 PEERS_LIST_EMPTY	The specified list of peers is empty.
 PEER_FLOOD	The method can't be used because your account is currently limited
 PEER_HISTORY_EMPTY	Peer history empty

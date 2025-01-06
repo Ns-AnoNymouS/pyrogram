@@ -89,6 +89,29 @@ class Animation(Object):
         self.height = height
         self.duration = duration
         self.thumbs = thumbs
+    
+    async def add_to_gifs(
+        self,
+        unsave: bool = False
+    ) -> bool:
+        """Bound method *add_to_gifs* of :obj:`~pyrogram.types.Message`.
+
+        .. include:: /_includes/usable-by/users.rst
+
+        Use as a shortcut for:
+        
+        .. code-block:: python
+
+            await app.add_to_gifs(message.animation.file_id)
+
+        Parameters:
+            unsave (``bool``, optional):
+                Whether to remove the GIF from the list of saved GIFs. Defaults to ``False``.
+
+        Returns:
+            ``bool``: True on success.
+        """
+        return await self._client.add_to_gifs(self.file_id, unsave)
 
     @staticmethod
     def _parse(

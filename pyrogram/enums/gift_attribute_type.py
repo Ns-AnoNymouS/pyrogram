@@ -16,33 +16,21 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-from .apply_gift_code import ApplyGiftCode
-from .check_gift_code import CheckGiftCode
-from .convert_gift import ConvertGift
-from .get_payment_form import GetPaymentForm
-from .get_available_gifts import GetAvailableGifts
-from .get_user_gifts_count import GetUserGiftsCount
-from .get_user_gifts import GetUserGifts
-from .hide_gift import HideGift
-from .send_payment_form import SendPaymentForm
-from .send_gift import SendGift
-from .show_gift import ShowGift
-from .transfer_gift import TransferGift
-from .upgrade_gift import UpgradeGift
+from pyrogram import raw
+from .auto_name import AutoName
 
-class Payments(
-    ApplyGiftCode,
-    CheckGiftCode,
-    ConvertGift,
-    GetPaymentForm,
-    GetAvailableGifts,
-    GetUserGiftsCount,
-    GetUserGifts,
-    HideGift,
-    SendPaymentForm,
-    SendGift,
-    ShowGift,
-    TransferGift,
-    UpgradeGift
-):
-    pass
+
+class GiftAttributeType(AutoName):
+    """Star gift attribute type enumeration used in :obj:`~pyrogram.types.GiftAttribute`."""
+
+    MODEL = raw.types.StarGiftAttributeModel
+    "Model attribute"
+
+    SYMBOL = raw.types.StarGiftAttributePattern
+    "Symbol attribute"
+
+    BACKDROP = raw.types.StarGiftAttributeBackdrop
+    "Backdrop attribute"
+
+    ORIGINAL_DETAILS = raw.types.StarGiftAttributeOriginalDetails
+    "Original details attribute"

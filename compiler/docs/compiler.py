@@ -208,6 +208,7 @@ def pyrogram_api():
             delete_chat_history
             send_paid_media
             send_paid_reaction
+            add_to_gifs
         """,
         chats="""
         Chats
@@ -325,15 +326,17 @@ def pyrogram_api():
         Payments
             apply_gift_code
             check_gift_code
-            convert_star_gift
+            convert_gift
             get_payment_form
-            get_star_gifts
-            get_user_star_gifts_count
-            get_user_star_gifts
-            hide_star_gift
+            get_available_gifts
+            get_user_gifts_count
+            get_user_gifts
+            hide_gift
             send_payment_form
-            send_star_gift
-            show_star_gift
+            send_gift
+            show_gift
+            transfer_gift
+            upgrade_gift
         """,
         phone="""
         Phone
@@ -544,7 +547,7 @@ def pyrogram_api():
             Dice
             Reaction
             RefundedPayment
-            StarGift
+            Gift
             VideoChatScheduled
             VideoChatStarted
             VideoChatEnded
@@ -572,6 +575,7 @@ def pyrogram_api():
             ContactRegistered
             ScreenshotTaken
             WriteAccessAllowed
+            GiftAttribute
         """,
         bot_keyboards="""
         Bot keyboards
@@ -841,10 +845,17 @@ def pyrogram_api():
         ActiveSession
             ActiveSession.reset
         """,
-        star_gift="""
-        StarGift
-            StarGift.show
-            StarGift.hide
+        gift="""
+        Gift
+            Gift.show
+            Gift.hide
+            Gift.convert
+            Gift.upgrade
+            Gift.transfer
+        """,
+        animation="""
+        Animation
+            Animation.add_to_gifs
         """
     )
 
@@ -906,6 +917,7 @@ def pyrogram_api():
             SentCodeType
             StoriesPrivacyRules
             UserStatus
+            GiftAttributeType
         """,
     )
 

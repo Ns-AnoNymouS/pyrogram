@@ -16,33 +16,37 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-from .apply_gift_code import ApplyGiftCode
-from .check_gift_code import CheckGiftCode
-from .convert_gift import ConvertGift
-from .get_payment_form import GetPaymentForm
-from .get_available_gifts import GetAvailableGifts
-from .get_user_gifts_count import GetUserGiftsCount
-from .get_user_gifts import GetUserGifts
-from .hide_gift import HideGift
-from .send_payment_form import SendPaymentForm
-from .send_gift import SendGift
-from .show_gift import ShowGift
-from .transfer_gift import TransferGift
-from .upgrade_gift import UpgradeGift
 
-class Payments(
-    ApplyGiftCode,
-    CheckGiftCode,
-    ConvertGift,
-    GetPaymentForm,
-    GetAvailableGifts,
-    GetUserGiftsCount,
-    GetUserGifts,
-    HideGift,
-    SendPaymentForm,
-    SendGift,
-    ShowGift,
-    TransferGift,
-    UpgradeGift
-):
-    pass
+import pyrogram
+from pyrogram import raw
+
+
+class ConvertGift:
+    async def convert_gift(
+        self: "pyrogram.Client",
+        message_id: int
+    ) -> bool:
+        """Convert star gift to stars.
+
+        .. include:: /_includes/usable-by/users.rst
+
+        Parameters:
+            message_id (``int``):
+                Unique message identifier of star gift.
+
+        Returns:
+            ``bool``: On success, True is returned.
+
+        Example:
+            .. code-block:: python
+
+                # Convert gift
+                app.convert_gift(message_id=123)
+        """
+        r = await self.invoke(
+            raw.functions.payments.ConvertStarGift(
+                msg_id=message_id
+            )
+        )
+
+        return r

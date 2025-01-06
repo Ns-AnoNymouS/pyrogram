@@ -397,7 +397,7 @@ class Message(Object, Update):
         gift_code (:obj:`~pyrogram.types.GiftCode`, *optional*):
             Service message: gift code information.
 
-        star_gift (:obj:`~pyrogram.types.StarGift`, *optional*):
+        gift (:obj:`~pyrogram.types.Gift`, *optional*):
             Service message: star gift information.
 
         requested_chats (:obj:`~pyrogram.types.RequestedChats`, *optional*):
@@ -562,7 +562,7 @@ class Message(Object, Update):
         phone_call_ended: "types.PhoneCallEnded" = None,
         web_app_data: "types.WebAppData" = None,
         gift_code: "types.GiftCode" = None,
-        star_gift: "types.StarGift" = None,
+        gift: "types.Gift" = None,
         requested_chats: "types.RequestedChats" = None,
         successful_payment: "types.SuccessfulPayment" = None,
         refunded_payment: "types.RefundedPayment" = None,
@@ -689,7 +689,7 @@ class Message(Object, Update):
         self.phone_call_ended = phone_call_ended
         self.web_app_data = web_app_data
         self.gift_code = gift_code
-        self.star_gift = star_gift
+        self.gift = gift
         self.requested_chats = requested_chats
         self.successful_payment = successful_payment
         self.refunded_payment = refunded_payment
@@ -777,7 +777,7 @@ class Message(Object, Update):
             refunded_payment = None
             chat_ttl_period = None
             boosts_applied = None
-            star_gift = None
+            gift = None
             giveaway_completed = None
             connected_website = None
             write_access_allowed = None
@@ -906,9 +906,9 @@ class Message(Object, Update):
             elif isinstance(action, raw.types.MessageActionBoostApply):
                 boosts_applied = action.boosts
                 service_type = enums.MessageServiceType.BOOST_APPLY
-            elif isinstance(action, raw.types.MessageActionStarGift):
-                star_gift = await types.StarGift._parse_action(client, message, users)
-                service_type = enums.MessageServiceType.STAR_GIFT
+            elif isinstance(action, (raw.types.MessageActionStarGift, raw.types.MessageActionStarGiftUnique)):
+                gift = await types.Gift._parse_action(client, message, users)
+                service_type = enums.MessageServiceType.GIFT
             elif isinstance(action, raw.types.MessageActionBotAllowed):
                 connected_website = getattr(action, "domain", None)
                 if connected_website:
@@ -960,7 +960,7 @@ class Message(Object, Update):
                 giveaway_created=giveaway_created,
                 giveaway_completed=giveaway_completed,
                 gift_code=gift_code,
-                star_gift=star_gift,
+                gift=gift,
                 requested_chats=requested_chats,
                 successful_payment=successful_payment,
                 refunded_payment=refunded_payment,

@@ -123,7 +123,7 @@ class MessageServiceType(AutoName):
     BOOST_APPLY = auto()
     "Boost apply"
 
-    STAR_GIFT = auto()
+    GIFT = auto()
     "Star gift"
 
     CONNECTED_WEBSITE = auto()

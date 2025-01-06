@@ -16,6 +16,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 from typing import Union, List, Optional
 
 import pyrogram
@@ -37,8 +38,9 @@ class SendInlineBotResult:
         quote_text: Optional[str] = None,
         parse_mode: Optional["enums.ParseMode"] = None,
         quote_entities: Optional[List["types.MessageEntity"]] = None,
-        quote_offset: Optional[int] = None
-    ) -> "raw.base.Updates":
+        quote_offset: Optional[int] = None,
+        schedule_date: datetime = None,
+    ) -> "types.Message":
         """Send an inline bot result.
         Bot results can be retrieved using :meth:`~pyrogram.Client.get_inline_bot_results`
 
@@ -86,8 +88,11 @@ class SendInlineBotResult:
             quote_offset (``int``, *optional*):
                 Offset for quote in original message.
 
+            schedule_date (:py:obj:`~datetime.datetime`, *optional*):
+                Date when the message will be automatically sent.
+
         Returns:
-            :obj:`~pyrogram.raw.base.Updates`: Currently, on success, a raw result is returned.
+            :obj:`~pyrogram.types.Message`: On success, the sent message is returned or False if no message was sent.
 
         Example:
             .. code-block:: python
@@ -96,7 +101,7 @@ class SendInlineBotResult:
         """
         quote_text, quote_entities = (await utils.parse_text_entities(self, quote_text, parse_mode, quote_entities)).values()
 
-        return await self.invoke(
+        r = await self.invoke(
             raw.functions.messages.SendInlineBotResult(
                 peer=await self.resolve_peer(chat_id),
                 query_id=query_id,
@@ -111,6 +116,19 @@ class SendInlineBotResult:
                     quote_text=quote_text,
                     quote_entities=quote_entities,
                     quote_offset=quote_offset,
-                )
+                ),
+                schedule_date=utils.datetime_to_timestamp(schedule_date),
             )
         )
+
+        for i in r.updates:
+            if isinstance(i, (raw.types.UpdateNewMessage,
+                              raw.types.UpdateNewChannelMessage,
+                              raw.types.UpdateNewScheduledMessage)):
+                return await types.Message._parse(
+                    self, i.message,
+                    {i.id: i for i in r.users},
+                    {i.id: i for i in r.chats},
+                    is_scheduled=isinstance(i, raw.types.UpdateNewScheduledMessage),
+                    business_connection_id=getattr(i, "connection_id", None)
+                )

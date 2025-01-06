@@ -16,20 +16,21 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-
+import logging
 from typing import Union
 
 import pyrogram
 from pyrogram import raw
 
+log = logging.getLogger(__name__)
 
-class ShowStarGift:
-    async def show_star_gift(
+
+class GetUserGiftsCount:
+    async def get_user_gifts_count(
         self: "pyrogram.Client",
-        chat_id: Union[int, str],
-        message_id: int
-    ) -> bool:
-        """Display the star gift in your profile.
+        chat_id: Union[int, str]
+    ) -> int:
+        """Get the total count of star gifts of specified user.
 
         .. include:: /_includes/usable-by/users.rst
 
@@ -39,17 +40,13 @@ class ShowStarGift:
                 For your personal cloud (Saved Messages) you can simply use "me" or "self".
                 For a contact that exists in your Telegram address book you can use his phone number (str).
 
-            message_id (``int``):
-                Unique message identifier of star gift.
-
         Returns:
-            ``bool``: On success, True is returned.
+            ``int``: On success, the star gifts count is returned.
 
         Example:
             .. code-block:: python
 
-                # Show gift
-                app.show_star_gift(chat_id=chat_id, message_id=123)
+                await app.get_user_gifts_count(chat_id)
         """
         peer = await self.resolve_peer(chat_id)
 
@@ -57,11 +54,11 @@ class ShowStarGift:
             raise ValueError("chat_id must belong to a user.")
 
         r = await self.invoke(
-            raw.functions.payments.SaveStarGift(
+            raw.functions.payments.GetUserStarGifts(
                 user_id=peer,
-                msg_id=message_id,
-                unsave=False
+                offset="",
+                limit=1
             )
         )
 
-        return r
+        return r.count
